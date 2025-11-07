@@ -5,20 +5,20 @@ const ventures = [
     name: "OSIS",
     tagline: "Open Source Industry Standards",
     desc: "Automated, open standards & guidance development platform.",
-    href: "/ventures/osis"
+    href: "/ventures/osis",
   },
   {
     name: "Prefab Factory Certification",
     tagline: "Assurance for modern methods of construction",
     desc: "Third-party certification framework for prefab and modular factories.",
-    href: "/ventures/prefab-cert"
+    href: "/ventures/prefab-cert",
   },
   {
     name: "Future Ventures",
     tagline: "Idea-to-execution engine",
     desc: "Arxon-owned concepts that can be spun up by the agentic helper.",
-    href: "/ventures"
-  }
+    href: "/ventures",
+  },
 ];
 
 export default function Home() {
@@ -30,24 +30,25 @@ export default function Home() {
         </h1>
         <p className="text-slate-300 max-w-2xl">
           A modern holdings group that turns specialised ideas into fully
-          operational ventures using automated systems, standards-aligned frameworks,
-          and an agentic execution engine.
+          operational ventures using automated systems, standards-aligned
+          frameworks, and an agentic execution engine.
         </p>
       </header>
 
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-3">What Arxon Does</h2>
         <p className="text-slate-300 max-w-3xl">
-          Arxon owns and operates niche platforms such as OSIS and Prefab Factory Certification.
-          Our internal agentic helper can register entities, secure domains, deploy compliant
-          websites, and scaffold certification and standards workflows with human approval at key checkpoints.
+          Arxon owns and operates niche platforms such as OSIS and Prefab Factory
+          Certification. Our internal agentic helper can register entities, secure
+          domains, deploy compliant websites, and scaffold certification and
+          standards workflows with human approval at key checkpoints.
         </p>
       </section>
 
       <section className="mb-10">
         <h2 className="text-xl font-semibold mb-3">Ventures</h2>
         <div className="grid md:grid-cols-3 gap-4">
-          {ventures.map(v => (
+          {ventures.map((v) => (
             <Link
               key={v.name}
               href={v.href}
@@ -64,12 +65,13 @@ export default function Home() {
       <section className="border border-slate-800 rounded-2xl p-4 bg-black/40">
         <h2 className="text-lg font-semibold mb-2">Internal Agent Console</h2>
         <p className="text-slate-400 text-sm mb-3">
-          This is where Arxon&apos;s private agent executes tasks like domain purchase,
-          company setup, and new venture scaffolding. For now, this is wired to
-          backend workflows and requires explicit approval for any legal or financial actions.
+          Internal-only control surface for the agentic helper that executes
+          tasks like domain purchase, company setup, and new venture scaffolding
+          with explicit approval on legal and financial actions.
         </p>
         <p className="text-xs text-slate-500">
-          (In production, this section is behind secure auth. Public visitors only see a corporate overview.)
+          (In production this is secured; public visitors only see high-level
+          information.)
         </p>
       </section>
     </main>
