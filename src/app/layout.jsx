@@ -3,7 +3,7 @@ import "./globals.css";
 export const metadata = {
   title: "Arxon Holdings",
   description:
-    "Arxon Holdings – A parent platform for automated, standards-led ventures including OSIS and Prefab Factory Certification.",
+    "Arxon Holdings — Investments, Automation, AI Systems. Developing innovative operating models and deploying fully automated systems to turn concepts into reality.",
 };
 
 export default function RootLayout({ children }) {
