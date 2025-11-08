@@ -9,7 +9,7 @@ export async function POST(req) {
     }
 
     // --- Send request to n8n webhook ---
-    const response = await fetch(process.env.N8N_AGENT_WEBHOOK_URL, {
+    const upstream = await fetch(process.env.N8N_AGENT_WEBHOOK_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -22,15 +22,28 @@ export async function POST(req) {
       body: JSON.stringify({ message }),
     });
 
-    const result = await response.json();
+    const text = await upstream.text();
 
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+    // Try to parse JSON; fall back to text
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = null;
+    }
+
+    return new Response(parsed ? JSON.stringify(parsed) : text, {
+      status: upstream.status,
+      headers: {
+        "Content-Type": parsed ? "application/json" : "text/plain",
+      },
     });
   } catch (error) {
     console.error("Agent API error:", error);
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 
