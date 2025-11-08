@@ -5,10 +5,13 @@ export async function POST(req) {
     // --- Security check ---
     const key = req.headers.get("x-arxon-key");
     if (key !== process.env.ARXON_AGENT_KEY) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    // --- Send request to n8n webhook ---
+    // --- Call n8n webhook with basic auth ---
     const upstream = await fetch(process.env.N8N_AGENT_WEBHOOK_URL, {
       method: "POST",
       headers: {
@@ -24,13 +27,11 @@ export async function POST(req) {
 
     const text = await upstream.text();
 
-    // Try to parse JSON; fall back to text
-    let parsed;
+    // Try to parse JSON; if it fails, return raw text
+    let parsed = null;
     try {
       parsed = JSON.parse(text);
-    } catch {
-      parsed = null;
-    }
+    } catch (_) {}
 
     return new Response(parsed ? JSON.stringify(parsed) : text, {
       status: upstream.status,
