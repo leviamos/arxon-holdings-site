@@ -15,8 +15,11 @@ export async function POST(req) {
 }
 
 export async function GET() {
-  return new Response("Arxon Agent API is running. Use POST with x-arxon-key.", {
-    status: 200,
-    headers: { "Content-Type": "text/plain" },
-  });
+  return new Response(
+    "Arxon Agent API is running. Use POST with x-arxon-key.",
+    {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    }
+  );
 }
