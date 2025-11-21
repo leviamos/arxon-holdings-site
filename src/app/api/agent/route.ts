@@ -1,40 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
+import { arxonLog } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
-  // --- Access Control ---
-  const accessKey = req.headers.get("arxon-access-key");
-  if (!accessKey || accessKey !== "Arxon_owner_281083") {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
   try {
     const body = await req.json();
 
-    // Relay to Orchestrator (n8n)
-    const orchestrator = await fetch(
-      "https://leviamos.app.n8n.cloud/webhook/agent-orchestrator",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const { level, message, meta } = body;
 
-    const data = await orchestrator.json();
+    if (!level || !message) {
+      return NextResponse.json(
+        { error: "Missing 'level' or 'message' in request body." },
+        { status: 400 }
+      );
+    }
+
+    // Use shared logger
+    const logEntry = arxonLog(level, message, meta);
 
     return NextResponse.json(
-      { success: true, orchestrator_response: data },
+      { success: true, entry: logEntry },
       { status: 200 }
     );
-
   } catch (err: any) {
     return NextResponse.json(
-      { error: "Internal Server Error", details: err?.message },
+      {
+        error: "Failed to process log entry.",
+        details: err?.message || null,
+      },
       { status: 500 }
     );
   }
