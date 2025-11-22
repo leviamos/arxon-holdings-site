@@ -12,23 +12,33 @@ export default function SystemsPage() {
     try {
       const res = await fetch("/api/systems");
       const json = await res.json();
+
       if (json.systems) {
         setSystems(json.systems);
       }
     } catch (err) {
       console.error("Failed to load systems:", err);
     }
+
     setLoading(false);
   };
 
   useEffect(() => {
+    // Initial load
     loadSystems();
+
+    // Live polling every 5 seconds
+    const interval = setInterval(() => {
+      loadSystems();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
 
-      {/* Auto-register this subsystem */}
+      {/* Auto-register this subsystem as a module */}
       <AutoRegisterSubsystem
         id="systems-overview"
         name="Systems Overview Module"
@@ -53,6 +63,7 @@ export default function SystemsPage() {
 
       {!loading && systems.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
           {systems.map((sys) => (
             <SubsystemCard
               key={sys.id}
@@ -62,9 +73,9 @@ export default function SystemsPage() {
               description={sys.description}
             />
           ))}
+
         </div>
       )}
-
     </div>
   );
 }
