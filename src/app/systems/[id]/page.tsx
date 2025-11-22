@@ -5,6 +5,7 @@ import Link from "next/link";
 import { startHealthPoller } from "@/lib/healthPoller";
 import SubsystemMetricsPanel from "@/components/SubsystemMetricsPanel";
 import SubsystemMetricsSummary from "@/components/SubsystemMetricsSummary";
+import SubsystemMetricsChart from "@/components/SubsystemMetricsChart";
 
 export default function SubsystemDetailPage({
   params,
@@ -87,11 +88,14 @@ export default function SubsystemDetailPage({
             </p>
           </div>
 
-          {/* NEW: Summary Metrics Panel */}
+          {/* Summary Metrics Panel */}
           <SubsystemMetricsSummary metrics={system.metrics} />
 
-          {/* Full Metrics Panel */}
+          {/* Full Metrics JSON Panel */}
           <SubsystemMetricsPanel metrics={system.metrics} />
+
+          {/* NEW: Metrics Chart */}
+          <SubsystemMetricsChart subsystemId={id} />
 
           {/* Diagnostics */}
           <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-3">
