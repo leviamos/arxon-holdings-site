@@ -6,36 +6,20 @@ import ArxonCard from "@/components/ArxonCard";
 import ActivityLogPanel from "@/components/ActivityLogPanel";
 import AgentTuningPanel from "@/components/AgentTuningPanel";
 import InstructionHistoryPanel from "@/components/InstructionHistoryPanel";
+import { sendInstructionToAgent } from "@/lib/sendInstruction";
 
 export default function ConsoleDashboard() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<any>(null);
 
-  const sendInstruction = async () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
-
     setLoading(true);
     setOutput(null);
 
-    try {
-      const res = await fetch("/api/agent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "arxon-access-key": "Arxon_owner_281083"
-        },
-        body: JSON.stringify({
-          instruction: input,
-          timestamp: Date.now()
-        })
-      });
-
-      const data = await res.json();
-      setOutput(data);
-    } catch (err: any) {
-      setOutput({ error: err.message || "Failed to reach agent." });
-    }
+    const result = await sendInstructionToAgent(input);
+    setOutput(result);
 
     setLoading(false);
   };
@@ -49,6 +33,7 @@ export default function ConsoleDashboard() {
       {/* Direct Instruction Console */}
       <ArxonCard title="Direct Instruction Console">
         <div className="space-y-4">
+          
           <textarea
             className="w-full h-36 bg-neutral-900 border border-neutral-700 rounded-lg p-4 resize-none focus:outline-none focus:ring-2 focus:ring-neutral-600"
             placeholder="Enter instruction…"
@@ -57,7 +42,7 @@ export default function ConsoleDashboard() {
           />
 
           <button
-            onClick={sendInstruction}
+            onClick={handleSend}
             disabled={loading}
             className={`px-6 py-3 rounded-lg bg-neutral-100 text-neutral-900 font-semibold hover:bg-white transition-colors ${
               loading ? "opacity-50 cursor-not-allowed" : ""
