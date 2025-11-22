@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { startHealthPoller } from "@/lib/healthPoller";
+import { computeHealthScore } from "@/lib/healthScore";
 import SubsystemMetricsPanel from "@/components/SubsystemMetricsPanel";
 import SubsystemMetricsSummary from "@/components/SubsystemMetricsSummary";
 import SubsystemMetricsChart from "@/components/SubsystemMetricsChart";
+import HealthScoreBadge from "@/components/HealthScoreBadge";
 
 export default function SubsystemDetailPage({
   params,
@@ -43,6 +45,9 @@ export default function SubsystemDetailPage({
       ? "text-red-400"
       : "text-yellow-400";
 
+  // Compute health score when system updates
+  const healthScore = system ? computeHealthScore(system) : null;
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-10">
 
@@ -64,10 +69,17 @@ export default function SubsystemDetailPage({
       {system && !error && (
         <>
           {/* Header */}
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-white">
-              {system.name}
-            </h1>
+          <div className="space-y-3">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <h1 className="text-3xl font-bold tracking-tight text-white">
+                {system.name}
+              </h1>
+
+              {/* NEW: Health Score Badge */}
+              {healthScore !== null && (
+                <HealthScoreBadge score={healthScore} />
+              )}
+            </div>
 
             <div className="text-sm">
               <span className="text-neutral-500">Status: </span>
@@ -94,7 +106,7 @@ export default function SubsystemDetailPage({
           {/* Full Metrics JSON Panel */}
           <SubsystemMetricsPanel metrics={system.metrics} />
 
-          {/* NEW: Metrics Chart */}
+          {/* Chart */}
           <SubsystemMetricsChart subsystemId={id} />
 
           {/* Diagnostics */}
