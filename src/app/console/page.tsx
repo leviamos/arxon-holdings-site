@@ -4,6 +4,7 @@ import { useState } from "react";
 import SystemStatusPanel from "@/components/SystemStatusPanel";
 import ArxonCard from "@/components/ArxonCard";
 import ActivityLogPanel from "@/components/ActivityLogPanel";
+import AgentTuningPanel from "@/components/AgentTuningPanel";
 
 export default function ConsoleDashboard() {
   const [input, setInput] = useState("");
@@ -40,6 +41,7 @@ export default function ConsoleDashboard() {
 
   return (
     <div className="space-y-10">
+
       {/* System Status */}
       <SystemStatusPanel />
 
@@ -74,17 +76,15 @@ export default function ConsoleDashboard() {
         </div>
       </ArxonCard>
 
-      {/* Panels Section */}
+      {/* Panels Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Now Active: Activity Log Panel */}
+
+        {/* Left: Activity Logs */}
         <ActivityLogPanel />
 
-        {/* Placeholder for upcoming modules */}
-        <ArxonCard title="Agent Tuning (Coming Soon)">
-          <p className="text-neutral-500">
-            Model tuning and operational behaviour controls will appear here.
-          </p>
-        </ArxonCard>
+        {/* Right: Agent Tuning */}
+        <AgentTuningPanel />
+
       </div>
     </div>
   );
