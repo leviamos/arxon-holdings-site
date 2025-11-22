@@ -1,21 +1,14 @@
 /**
- * Global Event Store
- *
- * Stores system-wide events such as:
- * - subsystem status changes
- * - health degradation or recovery
- * - orchestrator actions
- * - metrics anomalies
- * - user/admin actions
- *
- * This is a rolling in-memory log (default: 200 entries).
+ * Updated Global Event Store — now with automatic alert binding.
  */
+
+import alertStore from "@/app/api/alerts/alertStore";
 
 interface EventEntry {
   timestamp: string;
-  type: string;       // e.g., "subsystem-offline", "health-recovered", "metrics-update", etc.
-  message: string;    // human-readable summary
-  details?: any;      // optional structured data
+  type: string;
+  message: string;
+  details?: any;
 }
 
 class EventStore {
@@ -23,28 +16,59 @@ class EventStore {
   private maxEvents = 200;
 
   addEvent(type: string, message: string, details?: any) {
-    this.events.push({
+    const entry: EventEntry = {
       timestamp: new Date().toISOString(),
       type,
       message,
       details: details || null
-    });
+    };
+
+    this.events.push(entry);
 
     if (this.events.length > this.maxEvents) {
-      this.events.shift(); // drop oldest
+      this.events.shift();
+    }
+
+    // --- AUTOMATIC ALERT GENERATION ---
+    if (type === "subsystem-offline") {
+      alertStore.addAlert({
+        severity: "critical",
+        message,
+        source: details?.id || "unknown",
+        details
+      });
+    }
+
+    if (type === "subsystem-critical") {
+      alertStore.addAlert({
+        severity: "critical",
+        message,
+        source: details?.id || "unknown",
+        details
+      });
+    }
+
+    if (type === "subsystem-degraded") {
+      alertStore.addAlert({
+        severity: "warning",
+        message,
+        source: details?.id || "unknown",
+        details
+      });
+    }
+
+    if (type === "subsystem-recovered") {
+      alertStore.addAlert({
+        severity: "info",
+        message,
+        source: details?.id || "unknown",
+        details
+      });
     }
   }
 
   getEvents() {
     return this.events;
-  }
-
-  getEventsByType(type: string) {
-    return this.events.filter((e) => e.type === type);
-  }
-
-  clear() {
-    this.events = [];
   }
 }
 
