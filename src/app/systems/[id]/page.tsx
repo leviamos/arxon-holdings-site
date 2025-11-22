@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { startHealthPoller } from "@/lib/healthPoller";
 import SubsystemMetricsPanel from "@/components/SubsystemMetricsPanel";
+import SubsystemMetricsSummary from "@/components/SubsystemMetricsSummary";
 
 export default function SubsystemDetailPage({
   params,
@@ -86,7 +87,10 @@ export default function SubsystemDetailPage({
             </p>
           </div>
 
-          {/* NEW: Metrics Panel */}
+          {/* NEW: Summary Metrics Panel */}
+          <SubsystemMetricsSummary metrics={system.metrics} />
+
+          {/* Full Metrics Panel */}
           <SubsystemMetricsPanel metrics={system.metrics} />
 
           {/* Diagnostics */}
