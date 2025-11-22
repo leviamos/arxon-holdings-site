@@ -1,42 +1,56 @@
-import React from "react";
+"use client";
 
-interface SubsystemCardProps {
-  id: string;
-  name: string;
-  status: string;
-  description?: string;
-}
+import Link from "next/link";
+import HealthScoreBadge from "@/components/HealthScoreBadge";
+import { computeHealthScore } from "@/lib/healthScore";
 
 export default function SubsystemCard({
   id,
   name,
   status,
   description,
-}: SubsystemCardProps) {
-  const statusColor =
-    status === "online"
+  metrics
+}: {
+  id: string;
+  name: string;
+  status: string;
+  description?: string;
+  metrics?: any;
+}) {
+
+  const score = computeHealthScore({
+    status,
+    metrics,
+    last_heartbeat: metrics?.last_updated
+  });
+
+  const statusColor = (s: string) =>
+    s === "online"
       ? "text-green-400"
-      : status === "offline"
+      : s === "offline"
       ? "text-red-400"
       : "text-yellow-400";
 
   return (
-    <div
-      key={id}
-      className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-2 panel fade-in"
+    <Link
+      href={`/systems/${id}`}
+      className="block bg-neutral-900 border border-neutral-800 rounded-xl p-6 hover:border-neutral-700 transition"
     >
-      <h2 className="text-xl font-semibold text-neutral-100">
-        {name}
-      </h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xl font-semibold text-white">{name}</h2>
 
-      <div className="text-sm text-neutral-400">
-        {description || "No description available."}
+        {/* NEW: Health Score Badge */}
+        <HealthScoreBadge score={score} />
       </div>
 
-      <div className="mt-3 text-sm">
+      <p className="text-sm text-neutral-400 mb-3">
         <span className="text-neutral-500">Status: </span>
-        <span className={statusColor}>{status}</span>
-      </div>
-    </div>
+        <span className={statusColor(status)}>{status}</span>
+      </p>
+
+      <p className="text-neutral-500 text-sm line-clamp-2">
+        {description || "No description available."}
+      </p>
+    </Link>
   );
 }
