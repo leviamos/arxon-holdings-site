@@ -3,6 +3,7 @@
 import { useState } from "react";
 import SystemStatusPanel from "@/components/SystemStatusPanel";
 import ArxonCard from "@/components/ArxonCard";
+import ActivityLogPanel from "@/components/ActivityLogPanel";
 
 export default function ConsoleDashboard() {
   const [input, setInput] = useState("");
@@ -42,7 +43,7 @@ export default function ConsoleDashboard() {
       {/* System Status */}
       <SystemStatusPanel />
 
-      {/* Command Console */}
+      {/* Direct Instruction Console */}
       <ArxonCard title="Direct Instruction Console">
         <div className="space-y-4">
           <textarea
@@ -73,14 +74,16 @@ export default function ConsoleDashboard() {
         </div>
       </ArxonCard>
 
-      {/* Future panels area */}
+      {/* Panels Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ArxonCard title="Activity Logs (Coming Soon)">
-          <p className="text-neutral-500">Log viewer module is not yet implemented.</p>
-        </ArxonCard>
+        {/* Now Active: Activity Log Panel */}
+        <ActivityLogPanel />
 
+        {/* Placeholder for upcoming modules */}
         <ArxonCard title="Agent Tuning (Coming Soon)">
-          <p className="text-neutral-500">Model tuning and behaviour controls will appear here.</p>
+          <p className="text-neutral-500">
+            Model tuning and operational behaviour controls will appear here.
+          </p>
         </ArxonCard>
       </div>
     </div>
