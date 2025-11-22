@@ -1,21 +1,11 @@
-/**
- * Alert Store
- *
- * Stores system alerts based on critical events.
- * Alerts are separate from events because:
- * - Alerts are user-facing
- * - Alerts may require action
- * - Alerts persist longer
- *
- * Default: 100 alerts stored.
- */
+import { dispatchAlert } from "@/lib/alertDispatcher";
 
 interface AlertEntry {
   id: string;
   timestamp: string;
   severity: "critical" | "warning" | "info";
   message: string;
-  source: string;     // subsystem id
+  source: string;
   details?: any;
 }
 
@@ -33,8 +23,11 @@ class AlertStore {
     this.alerts.push(alert);
 
     if (this.alerts.length > this.maxAlerts) {
-      this.alerts.shift(); // drop oldest
+      this.alerts.shift();
     }
+
+    // 🔥 AUTO-DISPATCH ALERT
+    dispatchAlert(alert).catch(() => { /* avoid breaking alert pipeline */ });
   }
 
   getAlerts() {
