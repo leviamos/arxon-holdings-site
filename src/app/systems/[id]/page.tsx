@@ -16,7 +16,6 @@ export default function SubsystemDetailPage({
   const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
-    // Start live polling
     const stop = startHealthPoller(
       id,
       ({ data, error }) => {
@@ -28,7 +27,7 @@ export default function SubsystemDetailPage({
         }
         setInitialLoad(false);
       },
-      5000 // 5 second interval
+      5000
     );
 
     return () => stop();
@@ -44,7 +43,6 @@ export default function SubsystemDetailPage({
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-10">
 
-      {/* Back Link */}
       <Link
         href="/systems"
         className="text-neutral-400 hover:text-white text-sm"
@@ -52,17 +50,14 @@ export default function SubsystemDetailPage({
         ← Back to Systems Overview
       </Link>
 
-      {/* Initial Loading */}
       {initialLoad && (
         <p className="text-neutral-400">Loading subsystem details…</p>
       )}
 
-      {/* Error State */}
       {!initialLoad && error && (
         <p className="text-red-400">{error}</p>
       )}
 
-      {/* Subsystem Details */}
       {system && !error && (
         <>
           <div className="space-y-2">
@@ -77,33 +72,53 @@ export default function SubsystemDetailPage({
               </span>
             </div>
 
+            {/* Last Heartbeat */}
+            {system.last_heartbeat && (
+              <div className="text-sm text-neutral-400">
+                <span className="text-neutral-500">Last heartbeat: </span>
+                {system.last_heartbeat}
+              </div>
+            )}
+
             <p className="text-neutral-400 text-sm">
               {system.description || "No description available."}
             </p>
           </div>
 
-          {/* Live Diagnostics */}
+          {/* Live Metadata */}
+          <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-3">
+            <h2 className="text-xl font-semibold text-neutral-100">
+              Live Metadata
+            </h2>
+
+            {system.metadata ? (
+              <pre className="text-neutral-300 text-sm whitespace-pre-wrap bg-neutral-950 p-3 rounded-lg border border-neutral-800">
+                {JSON.stringify(system.metadata, null, 2)}
+              </pre>
+            ) : (
+              <p className="text-neutral-500 text-sm">
+                No metadata available for this subsystem.
+              </p>
+            )}
+          </section>
+
+          {/* Diagnostics Section */}
           <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-3">
             <h2 className="text-xl font-semibold text-neutral-100">
               Diagnostics (Live)
             </h2>
-
             <p className="text-neutral-400 text-sm leading-relaxed">
-              This subsystem is being monitored in real time. Future metrics such as
-              heartbeat frequency, uptime percentage, API latency, memory usage, and
-              orchestrator workflow statistics will be displayed here.
+              More diagnostics will appear here as subsystem monitoring expands.
             </p>
           </section>
 
-          {/* Controls */}
+          {/* Controls Section */}
           <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-3">
             <h2 className="text-xl font-semibold text-neutral-100">
               Subsystem Controls
             </h2>
-
             <p className="text-neutral-400 text-sm leading-relaxed">
-              Restart, disable, or modify subsystem configuration here once controls
-              are implemented in later versions.
+              Restart, disable, configure, or trigger recovery routines in future versions.
             </p>
           </section>
         </>
