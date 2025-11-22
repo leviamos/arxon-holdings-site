@@ -5,6 +5,7 @@ import SystemStatusPanel from "@/components/SystemStatusPanel";
 import ArxonCard from "@/components/ArxonCard";
 import ActivityLogPanel from "@/components/ActivityLogPanel";
 import AgentTuningPanel from "@/components/AgentTuningPanel";
+import InstructionHistoryPanel from "@/components/InstructionHistoryPanel";
 
 export default function ConsoleDashboard() {
   const [input, setInput] = useState("");
@@ -76,14 +77,17 @@ export default function ConsoleDashboard() {
         </div>
       </ArxonCard>
 
-      {/* Panels Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Three-Panel Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left: Activity Logs */}
+        {/* Left */}
         <ActivityLogPanel />
 
-        {/* Right: Agent Tuning */}
+        {/* Middle */}
         <AgentTuningPanel />
+
+        {/* Right */}
+        <InstructionHistoryPanel />
 
       </div>
     </div>
