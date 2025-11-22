@@ -9,18 +9,24 @@ interface AlertEntry {
   details?: any;
   acknowledged: boolean;
   acknowledgedAt?: string;
+  correlationId?: string;
 }
 
 class AlertStore {
   private alerts: AlertEntry[] = [];
   private maxAlerts = 100;
 
-  addAlert(entry: Omit<AlertEntry, "id" | "timestamp" | "acknowledged">) {
+  addAlert(
+    entry: Omit<
+      AlertEntry,
+      "id" | "timestamp" | "acknowledged" | "acknowledgedAt"
+    >
+  ) {
     const alert: AlertEntry = {
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       acknowledged: false,
-      ...entry
+      ...entry,
     };
 
     this.alerts.push(alert);
@@ -29,7 +35,7 @@ class AlertStore {
       this.alerts.shift();
     }
 
-    // auto-dispatch
+    // Outbound dispatch
     dispatchAlert(alert).catch(() => {});
   }
 
