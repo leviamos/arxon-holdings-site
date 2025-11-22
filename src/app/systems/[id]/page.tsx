@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { startHealthPoller } from "@/lib/healthPoller";
+import SubsystemMetricsPanel from "@/components/SubsystemMetricsPanel";
 
 export default function SubsystemDetailPage({
   params,
@@ -60,6 +61,7 @@ export default function SubsystemDetailPage({
 
       {system && !error && (
         <>
+          {/* Header */}
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight text-white">
               {system.name}
@@ -72,7 +74,6 @@ export default function SubsystemDetailPage({
               </span>
             </div>
 
-            {/* Last Heartbeat */}
             {system.last_heartbeat && (
               <div className="text-sm text-neutral-400">
                 <span className="text-neutral-500">Last heartbeat: </span>
@@ -85,24 +86,10 @@ export default function SubsystemDetailPage({
             </p>
           </div>
 
-          {/* Live Metadata */}
-          <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-3">
-            <h2 className="text-xl font-semibold text-neutral-100">
-              Live Metadata
-            </h2>
+          {/* NEW: Metrics Panel */}
+          <SubsystemMetricsPanel metrics={system.metrics} />
 
-            {system.metadata ? (
-              <pre className="text-neutral-300 text-sm whitespace-pre-wrap bg-neutral-950 p-3 rounded-lg border border-neutral-800">
-                {JSON.stringify(system.metadata, null, 2)}
-              </pre>
-            ) : (
-              <p className="text-neutral-500 text-sm">
-                No metadata available for this subsystem.
-              </p>
-            )}
-          </section>
-
-          {/* Diagnostics Section */}
+          {/* Diagnostics */}
           <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-3">
             <h2 className="text-xl font-semibold text-neutral-100">
               Diagnostics (Live)
@@ -112,7 +99,7 @@ export default function SubsystemDetailPage({
             </p>
           </section>
 
-          {/* Controls Section */}
+          {/* Controls */}
           <section className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-3">
             <h2 className="text-xl font-semibold text-neutral-100">
               Subsystem Controls
