@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import SubsystemCard from "@/components/SubsystemCard";
+import AutoRegisterSubsystem from "@/components/AutoRegisterSubsystem";
 
 export default function SystemsPage() {
   const [systems, setSystems] = useState<any[]>([]);
@@ -27,6 +28,13 @@ export default function SystemsPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
 
+      {/* Auto-register this subsystem */}
+      <AutoRegisterSubsystem
+        id="systems-overview"
+        name="Systems Overview Module"
+        description="Provides a complete view of all registered subsystems."
+      />
+
       <h1 className="text-3xl font-bold tracking-tight">
         Systems Overview
       </h1>
@@ -45,7 +53,6 @@ export default function SystemsPage() {
 
       {!loading && systems.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
           {systems.map((sys) => (
             <SubsystemCard
               key={sys.id}
@@ -55,7 +62,6 @@ export default function SystemsPage() {
               description={sys.description}
             />
           ))}
-
         </div>
       )}
 
