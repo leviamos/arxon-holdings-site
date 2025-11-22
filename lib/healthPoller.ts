@@ -1,51 +1,88 @@
-/**
- * Polls subsystem health at a fixed interval.
- *
- * @param id        Subsystem ID as registered in /api/systems
- * @param interval  Polling interval in milliseconds (default: 5000)
- * @param callback  Function invoked with latest { data, error }
- *
- * Returns: cleanup function to stop polling
- */
+"use client";
+
+import eventStore from "@/app/api/events/eventStore";
+import { computeHealthScore } from "@/lib/healthScore";
+
+interface PollResult {
+  data?: any;
+  error?: string;
+}
+
+const lastStatus: Record<string, string> = {};
+const lastHealth: Record<string, number> = {};
+
 export function startHealthPoller(
   id: string,
-  callback: (result: { data: any | null; error: any | null }) => void,
-  interval: number = 5000
+  callback: (result: PollResult) => void,
+  interval = 5000
 ) {
-  let active = true;
-
-  const poll = async () => {
-    if (!active) return;
-
+  async function poll() {
     try {
       const res = await fetch(`/api/systems/${id}`);
       const json = await res.json();
 
-      if (json.system) {
-        callback({ data: json.system, error: null });
-      } else {
-        callback({
-          data: null,
-          error: json.error || "Unknown subsystem error",
-        });
+      if (!json || !json.system) {
+        callback({ error: "Invalid response" });
+        return;
       }
+
+      const system = json.system;
+      const currentStatus = system.status;
+      const currentHealth = computeHealthScore(system);
+
+      // --- EVENT: STATUS CHANGE ---
+      if (lastStatus[id] && lastStatus[id] !== currentStatus) {
+        if (currentStatus === "online") {
+          eventStore.addEvent(
+            "subsystem-online",
+            `${system.name} is now ONLINE`,
+            { id, status: currentStatus }
+          );
+        } else if (currentStatus === "offline") {
+          eventStore.addEvent(
+            "subsystem-offline",
+            `${system.name} is now OFFLINE`,
+            { id, status: currentStatus }
+          );
+        }
+      }
+
+      // --- EVENT: HEALTH CHANGE ---
+      if (lastHealth[id] !== undefined) {
+        if (currentHealth < 50 && lastHealth[id] >= 50) {
+          eventStore.addEvent(
+            "subsystem-critical",
+            `${system.name} entered CRITICAL health (${currentHealth}).`,
+            { id, health: currentHealth }
+          );
+        } else if (currentHealth < 80 && lastHealth[id] >= 80) {
+          eventStore.addEvent(
+            "subsystem-degraded",
+            `${system.name} became DEGRADED (${currentHealth}).`,
+            { id, health: currentHealth }
+          );
+        } else if (currentHealth >= 80 && lastHealth[id] < 80) {
+          eventStore.addEvent(
+            "subsystem-recovered",
+            `${system.name} recovered to HEALTHY (${currentHealth}).`,
+            { id, health: currentHealth }
+          );
+        }
+      }
+
+      // --- UPDATE TRACKED VALUES ---
+      lastStatus[id] = currentStatus;
+      lastHealth[id] = currentHealth;
+
+      callback({ data: system });
+
     } catch (err: any) {
-      callback({
-        data: null,
-        error: err.message || "Failed to fetch subsystem health",
-      });
+      callback({ error: "Failed to poll health" });
     }
+  }
 
-    if (active) {
-      setTimeout(poll, interval);
-    }
-  };
-
-  // Start immediately
   poll();
+  const handle = setInterval(poll, interval);
 
-  // Stop polling
-  return () => {
-    active = false;
-  };
+  return () => clearInterval(handle);
 }
