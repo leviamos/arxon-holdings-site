@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import SubsystemCard from "@/components/SubsystemCard";
 
 export default function SystemsPage() {
   const [systems, setSystems] = useState<any[]>([]);
@@ -35,7 +36,7 @@ export default function SystemsPage() {
       </p>
 
       {loading && (
-        <p classname="text-neutral-400">Loading systems…</p>
+        <p className="text-neutral-400">Loading systems…</p>
       )}
 
       {!loading && systems.length === 0 && (
@@ -46,33 +47,13 @@ export default function SystemsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {systems.map((sys) => (
-            <div
+            <SubsystemCard
               key={sys.id}
-              className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 space-y-2"
-            >
-              <h2 className="text-xl font-semibold text-neutral-100">
-                {sys.name}
-              </h2>
-
-              <div className="text-sm text-neutral-400">
-                {sys.description || "No description available."}
-              </div>
-
-              <div className="mt-3 text-sm">
-                <span className="text-neutral-500">Status: </span>
-                <span
-                  className={
-                    sys.status === "online"
-                      ? "text-green-400"
-                      : sys.status === "offline"
-                      ? "text-red-400"
-                      : "text-yellow-400"
-                  }
-                >
-                  {sys.status}
-                </span>
-              </div>
-            </div>
+              id={sys.id}
+              name={sys.name}
+              status={sys.status}
+              description={sys.description}
+            />
           ))}
 
         </div>
