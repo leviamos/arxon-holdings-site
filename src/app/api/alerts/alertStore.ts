@@ -7,16 +7,19 @@ interface AlertEntry {
   message: string;
   source: string;
   details?: any;
+  acknowledged: boolean;
+  acknowledgedAt?: string;
 }
 
 class AlertStore {
   private alerts: AlertEntry[] = [];
   private maxAlerts = 100;
 
-  addAlert(entry: Omit<AlertEntry, "id" | "timestamp">) {
+  addAlert(entry: Omit<AlertEntry, "id" | "timestamp" | "acknowledged">) {
     const alert: AlertEntry = {
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
+      acknowledged: false,
       ...entry
     };
 
@@ -26,12 +29,22 @@ class AlertStore {
       this.alerts.shift();
     }
 
-    // 🔥 AUTO-DISPATCH ALERT
-    dispatchAlert(alert).catch(() => { /* avoid breaking alert pipeline */ });
+    // auto-dispatch
+    dispatchAlert(alert).catch(() => {});
   }
 
   getAlerts() {
     return this.alerts;
+  }
+
+  acknowledgeAlert(id: string) {
+    const alert = this.alerts.find((a) => a.id === id);
+    if (!alert) return false;
+
+    alert.acknowledged = true;
+    alert.acknowledgedAt = new Date().toISOString();
+
+    return true;
   }
 
   clear() {
