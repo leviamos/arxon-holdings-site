@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import systemsData from "@/app/api/systems/store";
+import metricsStore from "@/app/api/systems/metricsStore";
 
 /**
- * Metrics Ingestion API
+ * Metrics Ingestion API (Upgraded for History)
  *
  * POST /api/systems/:id/metrics
  *
- * Body example:
- * {
- *   "cpu": 0.12,
- *   "memory": 328,
- *   "latency": 42,
- *   "queue": 5
- * }
+ * Stores both latest metrics & historical metrics.
  */
 
 export async function POST(
@@ -32,17 +27,21 @@ export async function POST(
       );
     }
 
-    // Metrics container
+    // Update latest metrics on subsystem
     system.metrics = {
       ...(system.metrics || {}),
       ...body,
       last_updated: new Date().toISOString(),
     };
 
+    // Push into historical store
+    metricsStore.addMetric(id, system.metrics);
+
     return NextResponse.json(
       {
         success: true,
-        metrics: system.metrics,
+        latest: system.metrics,
+        history_length: metricsStore.getMetrics(id).length,
       },
       { status: 200 }
     );
