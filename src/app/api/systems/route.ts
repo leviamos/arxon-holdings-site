@@ -1,3 +1,5 @@
+import "@/app/api/systems/offline-checker";
+
 import { NextResponse } from "next/server";
 
 //
